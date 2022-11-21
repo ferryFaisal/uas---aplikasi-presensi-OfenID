@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="5A"> 5A </option>
                     <option value="5B"> 5B </option>
                   </select>
-                  <input type="submit">
+                  <!-- <input type="submit"> -->
                   </form>
                 </div>
               </div>
