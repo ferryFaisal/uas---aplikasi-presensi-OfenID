@@ -24,8 +24,12 @@
   <?php
 session_start();
 //pemeriksaan session
-if (isset($_SESSION['name'])) {//jika sudah login
-    // header("Location:index.php");
+if (isset($_SESSION['role'])) {//jika sudah login
+  if ($_SESSION['role'] == 'Admin') {
+    header("Location:../index.php");
+  } else {
+    header("Location:/uas---aplikasi-presensi-OfenID/");
+  }
 }
 $pw = $email = "";
 function cek($data) {
@@ -57,8 +61,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION['email'] = $email;
       $_SESSION['name'] = $name;
       //menuju ke halaman pemeriksaan session
-      header('Location: index.php');
-      echo '<script>alert("nama akun:'.$_SESSION['name'].'")</script>';
+      if ($role == 'Admin') {
+        echo '<script>alert("Anda Admin")</script>';
+        header("Location:../index.php");
+      } else {
+        echo '<script>alert("Anda Dosen")</script>';
+        header("Location:/uas---aplikasi-presensi-OfenID/");
+      }
+      // header('Location: index.php');
       die;
     } else{
       echo '<script>alert("Login Gagal")</script>';
@@ -100,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
         <div class="text-center">
           <a class="d-block small mt-3" href="register.php">Register an Account</a>
-          <a class="d-block small" href="/uas---aplikasi-presensi-OfenID/index.php">Forgot Password?</a>
+          <a class="d-block small" href="/uas---aplikasi-presensi-OfenID/admin/back/database.php">Forgot Password?</a>
         </div>
       </div>
     </div>
