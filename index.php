@@ -7,6 +7,44 @@ if (!isset($_SESSION['role'])) {//jika sudah login
   //session belum ada artinya belum login
   header("Location:admin/trash/login.php");
 }
+function cek($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (isset($_POST['submit'])) {
+    
+    require 'admin/trash/database.php';
+    $tgl = cek($_POST['tgl']);
+    $makul = cek($_POST['makul']);
+    $kelas = cek($_POST['kelas']);
+    $nim = cek($_POST['nim']);
+    $name = cek($_POST['nama']);
+    $presensi= cek($_POST['presensi']);
+    $sql = "SELECT tgl_presensi from presensi WHERE tgl_presensi = '$tgl' and nim = '$nim'";
+    $result = $conn->query($sql);
+    //cek email terdaftar
+    if ($result->num_rows == 0) {
+      //cek pw sama
+      // echo "pw1 : ".cek($password).", pw2 : ".$cpassword."<br>";
+        // echo "masuk";
+        $sql = "INSERT INTO presensi (tgl_presensi, makul, kelas, nim, nama, status_presensi) 
+        VALUES 
+        ('$tgl','$makul','$kelas','$nim', '$name', '$presensi')";
+        if ($conn->query($sql) === TRUE) {
+          echo "<script>alert('Data baru telah ditambahkan')</script>";
+          // echo "New record created succesfully";
+        } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } else {
+      echo "<script>alert('Sudah ada absensi NIM:$nim pada tanggal $tgl')</script>";
+    }
+    $conn->close();
+  }
+}
 ?>
 <head>
     <meta charset="utf-8">
@@ -27,7 +65,7 @@ if (!isset($_SESSION['role'])) {//jika sudah login
             <div class="row form-row mb-1">
               <div class="col-md-4">
                 <div class="form-label-group">
-                  <input type="date" id="tgl" name="tgl" class="form-control" placeholder="Tgl" value="<?=date("Y-m-d")?>" >
+                  <input type="date" id="tgl" name="tgl" class="form-control" autofocus="autofocus" placeholder="Tgl" value="<?=date("Y-m-d")?>" >
                 </div>
               </div>
               <div class="col-md-4">
@@ -42,11 +80,13 @@ if (!isset($_SESSION['role'])) {//jika sudah login
               </div>
               <div class="col-md-4">
                 <div class="form-label-group">
-                  <select name="kelas" id="kelas" class="form-control" autofocus="autofocus" onchange="myFunction()">
+                  <form method="post" action="">
+                  <select name="kelas" id="kelas" class="form-control" autofocus="autofocus" required onchange="this.form.submit()">
                     <option value=""> -- Pilih Kelas -- </option>
                     <option value="5A"> 5A </option>
                     <option value="5B"> 5B </option>
                   </select>
+                  </form>
                 </div>
               </div>
             </div><hr>
@@ -57,7 +97,11 @@ if (!isset($_SESSION['role'])) {//jika sudah login
             </div><hr>
             <?php
                 require 'admin/trash/database.php';
-                  $sql = "SELECT * FROM mahasiswa ORDER BY nim ASC";
+                  if (isset($_POST['kelas'])) {
+                    $sql = "SELECT * FROM mahasiswa where kelas = '$_POST[kelas]' ORDER BY nim ASC";
+                  }else{
+                    $sql = "SELECT * FROM mahasiswa ORDER BY nim ASC";
+                  }
                   $result = $conn->query($sql);
                   foreach($result as $row)
                   {
